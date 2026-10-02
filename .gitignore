@@ -19,8 +19,21 @@ npm-debug.log*
 .DS_Store
 
 # Editor
-.vscode/
+.vscode/*
+!.vscode/extensions.json
 .idea/
 
 # Docker
 *.pid
+
+# Testing
+coverage/
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+
+# Build caches
+.turbo/
+*.tsbuildinfo
+next-env.d.ts
