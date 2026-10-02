@@ -1,0 +1,13 @@
+package-lock.json
+
+# Build output
+**/dist
+**/.next
+**/*.tsbuildinfo
+next-env.d.ts
+
+# Reports
+coverage
+playwright-report
+test-results
+blob-report

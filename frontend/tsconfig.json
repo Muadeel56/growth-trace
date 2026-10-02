@@ -1,0 +1,12 @@
+{
+  "extends": "@growthtrace/config/tsconfig.base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "preserve",
+    "lib": ["dom", "dom.iterable", "ES2022"],
+    "noEmit": true,
+    "plugins": [{ "name": "next" }]
+  },
+  "include": ["src"]
+}

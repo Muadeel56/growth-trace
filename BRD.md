@@ -38,25 +38,25 @@ For Aadi, this is a birthday project (build window: Sep 20 – Oct 24, 2026) wit
 
 ## 4. Stakeholders & Target Users
 
-| Role | Who | Interest |
-| --- | --- | --- |
-| Builder / primary user | Aadi | Learns the stack, uses the product on himself first |
-| Secondary users | Developers who want an honest record of their own output | Sign up, connect GitHub, view their own dashboard/chat — no interaction with other users' data |
+| Role                   | Who                                                      | Interest                                                                                       |
+| ---------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Builder / primary user | Aadi                                                     | Learns the stack, uses the product on himself first                                            |
+| Secondary users        | Developers who want an honest record of their own output | Sign up, connect GitHub, view their own dashboard/chat — no interaction with other users' data |
 
 This is a solo project with no team dependency; "stakeholders" here means Aadi as builder-and-user, plus any future signups once deployed publicly.
 
 ## 5. Business Requirements
 
-| ID | Requirement | Priority |
-| --- | --- | --- |
-| BR-1 | Users can sign up and log in using their GitHub account | Must |
-| BR-2 | The system automatically ingests a connected user's GitHub activity without manual data entry | Must |
-| BR-3 | Each user sees only their own data; no cross-user data exposure | Must |
-| BR-4 | Users can ask natural-language questions about their own history and get answers grounded in their real activity | Must |
-| BR-5 | Users can view a visual timeline/dashboard of their derived growth stats | Must |
-| BR-6 | The system re-syncs periodically without duplicating or losing events | Must |
-| BR-7 | The product is deployable on Aadi's own infrastructure without third-party PaaS lock-in | Should |
-| BR-8 | The chat feels responsive (streamed, not a long blocking wait) | Should |
+| ID   | Requirement                                                                                                      | Priority |
+| ---- | ---------------------------------------------------------------------------------------------------------------- | -------- |
+| BR-1 | Users can sign up and log in using their GitHub account                                                          | Must     |
+| BR-2 | The system automatically ingests a connected user's GitHub activity without manual data entry                    | Must     |
+| BR-3 | Each user sees only their own data; no cross-user data exposure                                                  | Must     |
+| BR-4 | Users can ask natural-language questions about their own history and get answers grounded in their real activity | Must     |
+| BR-5 | Users can view a visual timeline/dashboard of their derived growth stats                                         | Must     |
+| BR-6 | The system re-syncs periodically without duplicating or losing events                                            | Must     |
+| BR-7 | The product is deployable on Aadi's own infrastructure without third-party PaaS lock-in                          | Should   |
+| BR-8 | The chat feels responsive (streamed, not a long blocking wait)                                                   | Should   |
 
 ## 6. Success Criteria
 
@@ -82,19 +82,19 @@ This is a solo project with no team dependency; "stakeholders" here means Aadi a
 
 **Risks**
 
-| Risk | Impact | Mitigation |
-| --- | --- | --- |
-| OAuth + multi-tenancy takes longer than planned (new territory) | Delays everything downstream | Timebox Week 1 strictly; fall back to a simpler session model if OAuth stalls |
-| GitHub API rate limits under real testing | Sync jobs fail/stall | Build rate-limit handling and backoff from the start, not as an afterthought |
-| RAG answers feel generic or ungrounded | Undermines the emotional/product goal | Test retrieval quality manually each week with real personal data, not just unit tests |
-| Scope creep (LangChain, extra data sources, polish) | Misses the Oct 24 deadline | Treat Week 5 items beyond deploy as optional buffer, cut first |
+| Risk                                                            | Impact                                | Mitigation                                                                             |
+| --------------------------------------------------------------- | ------------------------------------- | -------------------------------------------------------------------------------------- |
+| OAuth + multi-tenancy takes longer than planned (new territory) | Delays everything downstream          | Timebox Week 1 strictly; fall back to a simpler session model if OAuth stalls          |
+| GitHub API rate limits under real testing                       | Sync jobs fail/stall                  | Build rate-limit handling and backoff from the start, not as an afterthought           |
+| RAG answers feel generic or ungrounded                          | Undermines the emotional/product goal | Test retrieval quality manually each week with real personal data, not just unit tests |
+| Scope creep (LangChain, extra data sources, polish)             | Misses the Oct 24 deadline            | Treat Week 5 items beyond deploy as optional buffer, cut first                         |
 
 ## 8. Timeline & Milestones
 
-| Week | Dates | Milestone |
-| --- | --- | --- |
-| 1 | Sep 20 – Sep 26 | Fastify skeleton, Prisma schema, GitHub OAuth login working end to end |
-| 2 | Sep 27 – Oct 3 | GitHub API client, per-user BullMQ sync job, idempotent event storage |
-| 3 | Oct 4 – Oct 10 | Activity summarization, embedding pipeline, pgvector storage |
-| 4 | Oct 11 – Oct 17 | RAG retrieval + LLM chat endpoint, streaming response |
-| 5 | Oct 18 – Oct 24 | Next.js dashboard + chat UI, self-deploy, buffer for fixes |
+| Week | Dates           | Milestone                                                              |
+| ---- | --------------- | ---------------------------------------------------------------------- |
+| 1    | Sep 20 – Sep 26 | Fastify skeleton, Prisma schema, GitHub OAuth login working end to end |
+| 2    | Sep 27 – Oct 3  | GitHub API client, per-user BullMQ sync job, idempotent event storage  |
+| 3    | Oct 4 – Oct 10  | Activity summarization, embedding pipeline, pgvector storage           |
+| 4    | Oct 11 – Oct 17 | RAG retrieval + LLM chat endpoint, streaming response                  |
+| 5    | Oct 18 – Oct 24 | Next.js dashboard + chat UI, self-deploy, buffer for fixes             |
