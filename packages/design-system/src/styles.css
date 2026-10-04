@@ -1,0 +1,90 @@
+/*
+ * Aurora stylesheet entry. The app imports this once, in frontend/src/app/layout.tsx.
+ * Nothing else in the repo may ship CSS.
+ */
+@import 'tailwindcss';
+@import './tokens/tokens.css';
+
+@source './';
+@source '../../../frontend/src';
+
+/*
+ * Run an animation only when the viewer allows motion and no ancestor forces it off
+ * (AuroraMotionProvider with reducedMotion="always", e.g. the /design toggle).
+ */
+@custom-variant motion-ok {
+  @media (prefers-reduced-motion: no-preference) {
+    &:not([data-reduced-motion='always'] *) {
+      @slot;
+    }
+  }
+}
+
+/* Named z-index layers (see tokens.css). */
+@utility z-base {
+  z-index: var(--z-base);
+}
+
+@utility z-raised {
+  z-index: var(--z-raised);
+}
+
+@utility z-nav {
+  z-index: var(--z-nav);
+}
+
+@utility z-overlay {
+  z-index: var(--z-overlay);
+}
+
+@utility z-dialog {
+  z-index: var(--z-dialog);
+}
+
+@utility z-toast {
+  z-index: var(--z-toast);
+}
+
+@utility z-tooltip {
+  z-index: var(--z-tooltip);
+}
+
+/* iOS safe-area padding for fixed bars. */
+@utility pb-safe {
+  padding-bottom: var(--safe-area-bottom);
+}
+
+/* Accent gradient fill used by primary buttons and highlights. */
+@utility bg-accent-gradient {
+  background-image: linear-gradient(135deg, var(--color-accent-from), var(--color-accent-to));
+}
+
+/* Moving highlight for skeletons and streaming text. */
+@utility bg-shimmer {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-surface-raised) 0%,
+    var(--color-border) 50%,
+    var(--color-surface-raised) 100%
+  );
+  background-size: 200% 100%;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: none;
+  }
+}

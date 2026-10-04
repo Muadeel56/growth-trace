@@ -11,22 +11,26 @@
     "packages/*"
   ],
   "scripts": {
-    "lint": "eslint . --max-warnings=0",
+    "lint": "eslint . --max-warnings=0 --report-unused-disable-directives",
     "lint:fix": "eslint . --fix",
+    "lint:styles": "stylelint \"packages/design-system/**/*.css\"",
+    "check:styles": "node packages/config/scripts/check-styles.js",
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "test:responsive": "playwright test --project=mobile --project=tablet --project=desktop --pass-with-no-tests",
     "clean:check": "knip",
-    "verify": "npm run format:check && npm run lint && npm run typecheck && npm run test && npm run test:responsive && npm run clean:check"
+    "verify": "npm run format:check && npm run lint && npm run lint:styles && npm run check:styles && npm run typecheck && npm run test && npm run test:responsive && npm run clean:check"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@growthtrace/config": "*",
     "@playwright/test": "^1.55.1",
     "eslint": "^9.36.0",
     "knip": "^5.64.1",
     "prettier": "^3.6.2",
+    "stylelint": "^17.16.0",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"
   }

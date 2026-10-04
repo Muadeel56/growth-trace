@@ -1,8 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const port = 3100;
+
 /**
- * Responsive viewport checks. There is no app to serve yet, so no `webServer` block;
- * add one (and a `baseURL`) once the Next.js frontend is scaffolded.
+ * Responsive and accessibility checks against the Next.js app (dev server, so the
+ * /design route is available). Every spec runs at mobile, tablet and desktop widths.
  */
 export default defineConfig({
   testDir: 'e2e',
@@ -10,6 +12,14 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? 'github' : 'list',
+  use: { baseURL: `http://localhost:${port}` },
+  webServer: {
+    command: `npm run dev -w @growthtrace/frontend -- --port ${port}`,
+    url: `http://localhost:${port}`,
+    reuseExistingServer: !process.env.CI,
+    timeout: 120_000,
+    env: { NEXT_TELEMETRY_DISABLED: '1' },
+  },
   projects: [
     {
       name: 'mobile',
