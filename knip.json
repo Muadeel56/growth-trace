@@ -6,19 +6,17 @@
       "project": ["*.{js,ts}", "e2e/**/*.ts"]
     },
     "packages/config": {
-      "project": ["*.js"],
-      "ignoreDependencies": ["tailwindcss"]
+      "entry": ["*.config.js", "scripts/*.js", "test/**/*.test.ts"],
+      "project": ["*.js", "eslint-rules/**/*.js", "scripts/**/*.js", "test/**/*.{js,ts}"]
     },
     "backend": {
       "entry": ["src/index.ts", "src/**/*.test.ts"],
       "project": ["src/**/*.ts"]
     },
     "frontend": {
-      "entry": ["src/index.ts", "src/**/*.test.ts"],
-      "project": ["src/**/*.{ts,tsx}"],
-      "ignoreUnresolved": ["next"]
+      "project": ["src/**/*.{ts,tsx}"]
     },
-    "packages/ui": {
+    "packages/design-system": {
       "entry": ["src/**/*.test.ts"],
       "project": ["src/**/*.{ts,tsx}"]
     }

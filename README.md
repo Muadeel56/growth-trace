@@ -56,33 +56,49 @@ See [BRD.md](BRD.md) and [FRD.md](FRD.md) for the full business and functional r
    npm ci
    ```
 
-Backend (`backend/`) and frontend (`frontend/`) project scaffolding begins in Week 1 and Week 5 respectively — see the timeline in [BRD.md](BRD.md#8-timeline--milestones). Until then each workspace holds a placeholder `src/index.ts` so the quality scripts below have something to check.
+7. Run the frontend (optional):
+
+   ```bash
+   npm run dev -w @growthtrace/frontend
+   ```
+
+   Open http://localhost:3000 for the placeholder dashboard and http://localhost:3000/design for the Aurora design system.
+
+Backend (`backend/`) scaffolding begins in Week 1 — see the timeline in [BRD.md](BRD.md#8-timeline--milestones). Until then it holds a placeholder `src/index.ts` so the quality scripts below have something to check.
 
 ## Quality scripts
 
 The repo is a single npm workspace root that owns every quality tool, so all of these run from the root:
 
-| Script                    | What it does                                                                              |
-| ------------------------- | ----------------------------------------------------------------------------------------- |
-| `npm run lint`            | ESLint across every workspace. Warnings fail (`--max-warnings=0`).                        |
-| `npm run lint:fix`        | Same, with auto-fixes applied.                                                            |
-| `npm run format`          | Prettier writes every file (Tailwind classes get sorted).                                 |
-| `npm run format:check`    | Prettier in check-only mode, used by `verify`.                                            |
-| `npm run typecheck`       | `tsc --noEmit` in each workspace.                                                         |
-| `npm run test`            | Vitest unit tests in each workspace.                                                      |
-| `npm run test:responsive` | Playwright viewport checks at mobile (375×812), tablet (768×1024) and desktop (1440×900). |
-| `npm run clean:check`     | knip — unused files, exports and dependencies.                                            |
-| `npm run verify`          | All of the above in order, stopping at the first failure.                                 |
+| Script                    | What it does                                                                             |
+| ------------------------- | ---------------------------------------------------------------------------------------- |
+| `npm run lint`            | ESLint across every workspace. Warnings fail (`--max-warnings=0`).                       |
+| `npm run lint:fix`        | Same, with auto-fixes applied.                                                           |
+| `npm run lint:styles`     | Stylelint on the design-system CSS: no raw colours or sizes outside the token block.     |
+| `npm run check:styles`    | Fails if any stylesheet exists outside `packages/design-system/`.                        |
+| `npm run format`          | Prettier writes every file (Tailwind classes get sorted).                                |
+| `npm run format:check`    | Prettier in check-only mode, used by `verify`.                                           |
+| `npm run typecheck`       | `tsc --noEmit` in each workspace.                                                        |
+| `npm run test`            | Vitest unit tests in each workspace.                                                     |
+| `npm run test:responsive` | Playwright at mobile (375×812), tablet (768×1024), desktop (1440×900): axe, no h-scroll. |
+| `npm run clean:check`     | knip — unused files, exports and dependencies.                                           |
+| `npm run verify`          | All of the above in order, stopping at the first failure.                                |
 
 **Run `npm run verify` before opening a PR.** It is the single gate that says the branch is healthy.
 
-Shared TypeScript, ESLint and Prettier configs live in `packages/config`; the root `eslint.config.js`, `prettier.config.js` and `tsconfig.base.json` just re-export them.
+Shared TypeScript, ESLint, Prettier and Stylelint configs live in `packages/config`; the root `eslint.config.js`, `prettier.config.js`, `stylelint.config.js` and `tsconfig.base.json` just re-export them.
+
+`test:responsive` starts the Next.js dev server on port 3100 (or reuses one already running). Run `npx playwright install chromium` once before the first run.
+
+## Styling
+
+All UI comes from `@growthtrace/design-system` (Aurora). Lint rejects anything else: palette or arbitrary Tailwind classes, `style={{}}`, raw colours, stray CSS files and inline animations, and `eslint-disable` can't switch those rules off. See [packages/design-system/README.md](packages/design-system/README.md) and [CLAUDE.md](CLAUDE.md).
 
 ## Repo layout
 
 - `backend/` — Fastify API (Node.js)
 - `frontend/` — Next.js dashboard
-- `packages/config/` — shared TypeScript, ESLint and Prettier configs
-- `packages/ui/` — shared design-system components (placeholder)
+- `packages/config/` — shared TypeScript, ESLint, Prettier and Stylelint configs, plus the Aurora lint rules
+- `packages/design-system/` — Aurora design system (`@growthtrace/design-system`): tokens, motion presets, components
 - `docs/adr/` — architecture decision records
 - `docker-compose.yml` — local dev infra (Postgres+pgvector, Redis, Ollama)
