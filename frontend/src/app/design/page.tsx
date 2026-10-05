@@ -6,6 +6,8 @@ import {
   Button,
   ChatBubble,
   cn,
+  DataTable,
+  type DataTableColumn,
   contrast,
   Dialog,
   DialogClose,
@@ -94,7 +96,36 @@ const spacing: Record<keyof typeof tokens.spacing, string> = {
   16: 'w-16',
   20: 'w-20',
   24: 'w-24',
+  touch: 'w-touch',
 };
+
+/** Type tokens that scale with the viewport (clamp), and the viewport range they grow over. */
+const fluidType: Partial<Record<keyof typeof tokens.text, string>> = {
+  display: '32px at ≤400px wide, growing to 56px at ≥1200px',
+  h1: '28px at ≤400px wide, growing to 36px at ≥800px',
+  h2: '22px at ≤400px wide, growing to 28px at ≥1000px',
+};
+
+type RepoRow = { repo: string; language: string; commits: number; summary: string };
+
+const repoColumns: DataTableColumn<RepoRow>[] = [
+  { key: 'repo', header: 'Repository' },
+  { key: 'language', header: 'Language' },
+  { key: 'commits', header: 'Commits', numeric: true },
+  { key: 'summary', header: 'Summary' },
+];
+
+const repoRows: RepoRow[] = [
+  { repo: 'growth-trace', language: 'TypeScript', commits: 342, summary: 'Dashboard and API.' },
+  { repo: 'dotfiles', language: 'Shell', commits: 58, summary: 'Editor and shell setup.' },
+  {
+    repo: 'an-unusually-long-repository-name-that-must-wrap-cleanly',
+    language: 'Rust',
+    commits: 1204,
+    summary:
+      'A long summary to prove that table cells and cards wrap text instead of pushing the layout wider than the screen, at every width from 320px up.',
+  },
+];
 
 const radii: Record<keyof typeof tokens.radius, string> = {
   sm: 'rounded-sm',
@@ -243,9 +274,14 @@ export default function DesignPage() {
               const t = tokens.text[name as keyof typeof tokens.text];
               return (
                 <div key={name} className="flex flex-col gap-1">
-                  <span className="font-mono text-caption text-muted">
+                  <span className="font-mono text-caption break-words text-muted">
                     {name} · {t.size} / {t.lineHeight} / {t.fontWeight}
                   </span>
+                  {fluidType[name as keyof typeof tokens.text] && (
+                    <span className="text-caption text-muted">
+                      Fluid: {fluidType[name as keyof typeof tokens.text]}.
+                    </span>
+                  )}
                   <p className={cn('break-words text-text', cls)}>Evidence of growth</p>
                 </div>
               );
@@ -265,14 +301,21 @@ export default function DesignPage() {
           <ul className="flex flex-col gap-2">
             {Object.entries(spacing).map(([name, cls]) => (
               <li key={name} className="flex items-center gap-4">
-                <span className="w-16 shrink-0 font-mono text-caption text-muted">
-                  {name} · {tokens.spacing[Number(name) as keyof typeof tokens.spacing]}
+                <span className="w-20 shrink-0 font-mono text-caption text-muted">
+                  {name} · {tokens.spacing[name as keyof typeof tokens.spacing]}
                 </span>
                 <span aria-hidden className={cn('h-3 rounded-sm bg-accent-gradient', cls)} />
               </li>
             ))}
           </ul>
+          <p className="text-body-sm text-muted">
+            touch is the minimum tap target below md: min-h-touch, min-w-touch, size-touch.
+          </p>
           <TokenTable rows={Object.entries(tokens.container)} />
+          <p className="text-body-sm text-muted">
+            Container sizes double as container-query variants: a Panel is a query container, so its
+            children can use @2xs:, @xs:, @sm:, @md:… to adapt to the panel&apos;s width.
+          </p>
           <TokenTable
             rows={Object.entries(tokens.safeArea).map(([name, value]) => [
               `safe-area-${name} (pb-safe)`,
@@ -469,6 +512,29 @@ export default function DesignPage() {
               <StatTile label="Reviews" value={18} delta={-6} trend={[...sampleTrend].reverse()} />
               <StatTile label="Repos" value={7} />
             </div>
+            <p className="text-body-sm text-muted">
+              Narrow slot (stacked) next to a wide slot (one row, larger value).
+            </p>
+            <div className="flex flex-col gap-4 sm:flex-row">
+              <StatTile
+                label="Narrow slot"
+                value={342}
+                delta={12}
+                className="w-full sm:max-w-2xs"
+              />
+              <StatTile label="Wide slot" value={342} delta={12} className="min-w-0 flex-1" />
+            </div>
+          </Subsection>
+          <Subsection title="DataTable">
+            <p className="text-body-sm text-muted">
+              A table from md up, a list of cards below md. Resize to switch modes.
+            </p>
+            <DataTable
+              caption="Most active repositories"
+              columns={repoColumns}
+              rows={repoRows}
+              rowKey={(row) => row.repo}
+            />
           </Subsection>
           <Subsection title="StreakMeter">
             <div className="grid gap-4 sm:grid-cols-2">

@@ -13,6 +13,7 @@ const SKIP_DIRS = new Set([
   'node_modules',
   '.git',
   '.next',
+  '.next-e2e',
   'dist',
   'build',
   'coverage',

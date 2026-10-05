@@ -79,6 +79,7 @@ describe('check:styles', () => {
     touch('packages/design-system/src/styles.css');
     touch('node_modules/some-lib/dist/lib.css');
     touch('frontend/.next/static/app.css');
+    touch('frontend/.next-e2e/dev/static/app.css');
     expect(findStrayStylesheets(root)).toEqual([]);
   });
 

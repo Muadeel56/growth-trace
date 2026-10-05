@@ -61,7 +61,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             </div>
             <RadixToast.Close
               aria-label="Dismiss"
-              className={cn('rounded-sm p-1 text-muted hover:text-text', focusRing)}
+              className={cn(
+                'inline-flex size-touch shrink-0 items-center justify-center rounded-sm text-muted hover:text-text',
+                focusRing,
+              )}
             >
               <X aria-hidden className="size-4" />
             </RadixToast.Close>

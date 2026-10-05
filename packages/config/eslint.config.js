@@ -44,6 +44,7 @@ export default tseslint.config(
       '**/node_modules',
       '**/dist',
       '**/.next',
+      '**/.next-e2e',
       '**/coverage',
       'playwright-report',
       'test-results',
@@ -148,6 +149,7 @@ export default tseslint.config(
     rules: {
       'aurora/no-arbitrary-values': 'error',
       'aurora/no-bare-z-index': 'error',
+      'aurora/no-desktop-first': 'error',
       'aurora/no-off-scale-opacity': ['error', { steps: opacitySteps }],
     },
   },

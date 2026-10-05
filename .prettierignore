@@ -3,6 +3,7 @@ package-lock.json
 # Build output
 **/dist
 **/.next
+**/.next-e2e
 **/*.tsbuildinfo
 next-env.d.ts
 

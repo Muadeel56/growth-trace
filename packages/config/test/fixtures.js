@@ -74,6 +74,18 @@ export const mustFail = [
     code: `export const A = () => <div className="z-50" />;`,
   },
   {
+    name: 'desktop-first breakpoint',
+    file: feature,
+    rule: 'aurora/no-desktop-first',
+    code: `export const A = () => <div className="flex max-md:hidden" />;`,
+  },
+  {
+    name: 'desktop-first container query in cn()',
+    file: 'frontend/src/features/fixture.ts',
+    rule: 'aurora/no-desktop-first',
+    code: `export const c = cn('grid @max-sm:grid-cols-1');`,
+  },
+  {
     name: 'default radius',
     file: feature,
     rule: 'better-tailwindcss/no-unknown-classes',
@@ -164,6 +176,11 @@ export const mustPass = [
     name: 'token classes in cn/cva',
     file: 'frontend/src/features/fixture.ts',
     code: `export const c = cn('bg-surface-raised px-4 text-body-sm', cva('rounded-full shadow-glow-accent'));`,
+  },
+  {
+    name: 'mobile-first breakpoints and container queries',
+    file: feature,
+    code: `export const A = () => <div className="@container flex-col max-w-page md:flex-row @xs:flex-row" />;`,
   },
   {
     name: 'opacity steps and fractions',

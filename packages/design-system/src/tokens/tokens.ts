@@ -46,9 +46,9 @@ export const tokens = {
     bold: '700',
   },
   text: {
-    display: { size: '2.75rem', lineHeight: '1.1', fontWeight: '700' },
-    h1: { size: '2.25rem', lineHeight: '1.2', fontWeight: '700' },
-    h2: { size: '1.75rem', lineHeight: '1.25', fontWeight: '600' },
+    display: { size: 'clamp(2rem, 1.25rem + 3vw, 3.5rem)', lineHeight: '1.1', fontWeight: '700' },
+    h1: { size: 'clamp(1.75rem, 1.25rem + 2vw, 2.25rem)', lineHeight: '1.2', fontWeight: '700' },
+    h2: { size: 'clamp(1.375rem, 1.125rem + 1vw, 1.75rem)', lineHeight: '1.25', fontWeight: '600' },
     h3: { size: '1.375rem', lineHeight: '1.3', fontWeight: '600' },
     'body-lg': { size: '1.125rem', lineHeight: '1.6', fontWeight: '400' },
     body: { size: '1rem', lineHeight: '1.6', fontWeight: '400' },
@@ -68,8 +68,13 @@ export const tokens = {
     16: '64px',
     20: '80px',
     24: '96px',
+    /** Minimum tap target below md. */
+    touch: '44px',
   },
   container: {
+    '2xs': '16rem',
+    xs: '20rem',
+    sm: '24rem',
     sidebar: '15rem',
     md: '28rem',
     lg: '32rem',

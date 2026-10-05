@@ -1,6 +1,6 @@
 'use client';
 
-import { type KeyboardEvent, useId, useRef, useState } from 'react';
+import { type KeyboardEvent, useEffect, useId, useRef, useState } from 'react';
 
 import { cn } from '../lib/cn';
 import { focusRing } from '../lib/focus';
@@ -43,6 +43,10 @@ export type ActivityHeatmapProps = {
 /**
  * GitHub-style activity grid. Each cell is a button with its own label and tooltip
  * (never colour alone); arrow keys move between days, Home/End jump to the ends.
+ *
+ * The grid scrolls sideways inside its own container and starts scrolled to the most
+ * recent week. Cells are exempt from the 44px tap-target rule (`data-tap-exempt`): the
+ * grid is one tab stop with roving focus, and the summary text carries the same data.
  */
 export function ActivityHeatmap({
   days,
@@ -52,6 +56,13 @@ export function ActivityHeatmap({
 }: ActivityHeatmapProps) {
   const summaryId = useId();
   const cells = useRef<(HTMLButtonElement | null)[]>([]);
+  const scroller = useRef<HTMLDivElement>(null);
+
+  // Phones show the latest weeks first; older ones are a swipe to the left.
+  useEffect(() => {
+    const el = scroller.current;
+    if (el) el.scrollLeft = el.scrollWidth;
+  }, []);
   const [active, setActive] = useState(Math.max(0, days.length - 1));
 
   const max = Math.max(0, ...days.map((d) => d.count));
@@ -70,12 +81,12 @@ export function ActivityHeatmap({
   };
 
   return (
-    <div className={cn('flex flex-col gap-3', className)}>
+    <div data-chart className={cn('flex flex-col gap-3', className)}>
       <p id={summaryId} className="text-body-sm text-muted">
         {plural(total, unit)} across {plural(activeDays, 'active day')} in the last{' '}
         {plural(days.length, 'day')}.
       </p>
-      <div className="overflow-x-auto pb-2">
+      <div ref={scroller} className="overflow-x-auto pb-2">
         <TooltipProvider>
           <div
             role="group"
@@ -96,6 +107,7 @@ export function ActivityHeatmap({
                     }}
                     type="button"
                     aria-label={text}
+                    data-tap-exempt="composite-grid"
                     tabIndex={index === active ? 0 : -1}
                     onFocus={() => setActive(index)}
                     onKeyDown={(event) => move(event, index)}

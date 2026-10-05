@@ -30,7 +30,7 @@ export function MotionDemo() {
           <Button variant="ghost" size="sm" onClick={() => setRun((n) => n + 1)}>
             Replay
           </Button>
-          <label className="flex items-center gap-2 text-body-sm text-text">
+          <label className="flex min-h-touch items-center gap-2 text-body-sm text-text">
             <input
               type="checkbox"
               checked={reduced}

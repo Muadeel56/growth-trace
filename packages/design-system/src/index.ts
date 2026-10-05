@@ -37,6 +37,7 @@ export {
 } from './components/ActivityHeatmap';
 export { AppShell, type AppShellProps, type NavItem } from './components/AppShell';
 export { ChatBubble, type ChatBubbleProps } from './components/ChatBubble';
+export { type DataTableColumn, DataTable, type DataTableProps } from './components/DataTable';
 export { StatTile, type StatTileProps } from './components/StatTile';
 export { StreakMeter, type StreakMeterProps } from './components/StreakMeter';
 export { type SyncState, SyncStatus, type SyncStatusProps } from './components/SyncStatus';

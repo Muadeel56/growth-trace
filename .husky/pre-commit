@@ -1,0 +1,5 @@
+# Responsive + accessibility check (Chromium), only when the commit touches UI code.
+# A dev server already running on port 3100 is reused.
+if git diff --cached --name-only | grep -qE '^(frontend|packages/design-system|e2e)/'; then
+  npm run test:responsive
+fi

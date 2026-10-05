@@ -23,7 +23,7 @@ export type AppShellProps = {
 };
 
 /**
- * App frame: sidebar nav from md up, bottom tab bar below md. Includes a skip link, the
+ * App frame: sidebar nav from md up, bottom tab bar below md (icon-only under 360px). Includes a skip link, the
  * z-nav layer and iOS safe-area padding under the tab bar.
  */
 export function AppShell({
@@ -58,7 +58,7 @@ export function AppShell({
                 href={item.href}
                 aria-current={item.current ? 'page' : undefined}
                 className={cn(
-                  'flex items-center gap-3 rounded-md px-3 py-2 text-body-sm transition-colors duration-fast',
+                  'flex min-h-touch items-center gap-3 rounded-md px-3 py-2 text-body-sm transition-colors duration-fast lg:min-h-0',
                   item.current
                     ? 'bg-surface-raised text-text'
                     : 'text-muted hover:bg-surface-raised hover:text-text',
@@ -101,7 +101,7 @@ export function AppShell({
                 href={item.href}
                 aria-current={item.current ? 'page' : undefined}
                 className={cn(
-                  'flex flex-col items-center gap-1 rounded-md px-2 py-1 text-caption',
+                  'flex min-h-touch flex-col items-center justify-center gap-1 rounded-md px-2 py-1 text-caption',
                   item.current ? 'text-accent-from' : 'text-muted hover:text-text',
                   focusRing,
                 )}
@@ -109,7 +109,8 @@ export function AppShell({
                 <span aria-hidden className="flex size-6 items-center justify-center">
                   {item.icon}
                 </span>
-                {item.label}
+                {/* Five labels don't fit under 360px: icon-only there, label kept for AT. */}
+                <span className="sr-only xs:not-sr-only">{item.label}</span>
               </Link>
             </li>
           ))}

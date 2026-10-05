@@ -37,7 +37,10 @@ export function DialogContent({ title, description, children, className }: Dialo
           <RadixDialog.Title className="text-h3 text-text">{title}</RadixDialog.Title>
           <RadixDialog.Close
             aria-label="Close"
-            className={cn('rounded-sm p-1 text-muted hover:text-text', focusRing)}
+            className={cn(
+              'inline-flex size-touch shrink-0 items-center justify-center rounded-sm text-muted hover:text-text',
+              focusRing,
+            )}
           >
             <X aria-hidden className="size-4" />
           </RadixDialog.Close>
