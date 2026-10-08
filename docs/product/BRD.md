@@ -68,19 +68,19 @@ This is a solo project with no team dependency; "stakeholders" here means Aadi a
 
 ## 7. Assumptions, Constraints & Risks
 
-**Assumptions**
+### Assumptions
 
 - Aadi builds this solo, part-time, alongside his day job at QTO Dev.
 - GitHub is a sufficient single data source for v1's "evidence-based growth" concept.
 - An LLM API (OpenAI/Anthropic) or a local model via Ollama is acceptable for generation — exact choice to be locked before Week 4.
 
-**Constraints**
+### Constraints
 
 - Fixed deadline: Oct 24, 2026 (5 weeks from Sep 20).
 - Solo development, no team to split OAuth/RAG/frontend work across.
 - Self-hosted deployment on existing Docker/Gitea infra, not a managed cloud platform.
 
-**Risks**
+### Risks
 
 | Risk                                                            | Impact                                | Mitigation                                                                             |
 | --------------------------------------------------------------- | ------------------------------------- | -------------------------------------------------------------------------------------- |

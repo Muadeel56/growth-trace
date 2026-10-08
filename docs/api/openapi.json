@@ -1,0 +1,48 @@
+{
+  "components": { "schemas": {} },
+  "info": {
+    "description": "Generated from the Fastify route schemas by `npm run docs:api`.",
+    "title": "GrowthTrace API",
+    "version": "0.0.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/health": {
+      "get": {
+        "description": "Returns `ok` when the API process is up. Does not check Postgres, Redis or Ollama.",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "description": "The API process is up.",
+                  "properties": {
+                    "source": {
+                      "anyOf": [
+                        { "enum": ["api"], "type": "string" },
+                        { "enum": ["fixture"], "type": "string" }
+                      ],
+                      "description": "Which backend answered: the real API or the Playwright stub."
+                    },
+                    "status": {
+                      "description": "Always `ok` when the process can serve requests.",
+                      "enum": ["ok"],
+                      "type": "string"
+                    }
+                  },
+                  "required": ["status", "source"],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The API process is up."
+          }
+        },
+        "summary": "Liveness check",
+        "tags": ["system"]
+      }
+    }
+  },
+  "tags": [{ "description": "Process health and metadata", "name": "system" }]
+}

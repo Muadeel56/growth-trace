@@ -18,7 +18,7 @@ Use **Ollama** (self-hosted, run via the `ollama/ollama` Docker image) for both 
 - Chat generation: `llama3.1`
 - Embeddings: `nomic-embed-text`
 
-Both models are pulled into the `ollama` service's volume after first `docker compose up` (see root `README.md`). Connection is configured via `OLLAMA_BASE_URL`, `OLLAMA_CHAT_MODEL`, and `OLLAMA_EMBEDDING_MODEL` in `.env`.
+Both models are pulled into the `ollama` service's volume after first `docker compose up` (see [local setup](../development/setup.md#4-ollama-models-first-time-only)). Connection is configured via `OLLAMA_BASE_URL`, `OLLAMA_CHAT_MODEL`, and `OLLAMA_EMBEDDING_MODEL` in `.env`.
 
 ## Consequences
 

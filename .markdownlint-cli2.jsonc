@@ -1,0 +1,18 @@
+// markdownlint-cli2 config for `npm run lint:md`, pre-commit, CI and the daily sweep.
+// Prettier owns formatting, so its conflicting rules are switched off via the shared style.
+{
+  "config": {
+    "extends": "markdownlint/style/prettier",
+    // Inline HTML is allowed for the generated-file banner and <details> blocks.
+    "no-inline-html": false,
+  },
+  "gitignore": true,
+  "ignores": [
+    "**/node_modules/**",
+    "**/CHANGELOG.md",
+    // Written by `next dev`; we don't control its format.
+    "frontend/AGENTS.md",
+    // A single `@AGENTS.md` import line for Claude Code, not a document.
+    "frontend/CLAUDE.md",
+  ],
+}
