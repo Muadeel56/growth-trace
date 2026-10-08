@@ -5,7 +5,7 @@ Plain Markdown in the repo is the source of truth. Pages marked _Planned_ descri
 ## Start here
 
 - **New contributor:** [README](../README.md) → [setup](development/setup.md) → [CONTRIBUTING](../CONTRIBUTING.md) → [architecture overview](architecture/overview.md) → [design-system principles](design-system/principles.md).
-- **Coding agent:** [AGENTS.md](../AGENTS.md) → [CONTRIBUTING](../CONTRIBUTING.md) (branches, commits, the doc-mapping table) → [quality gates](development/quality-gates.md) (`npm run verify`) → [design-system principles](design-system/principles.md) → the [FRD](product/FRD.md) requirement IDs for your task → the matching architecture page.
+- **Coding agent:** [AGENTS.md](../AGENTS.md) (plus [frontend](../frontend/AGENTS.md) or [backend](../backend/AGENTS.md) rules; Claude Code also reads [CLAUDE.md](../CLAUDE.md)) → [CONTRIBUTING](../CONTRIBUTING.md) (branches, commits, the doc-mapping table) → [quality gates](development/quality-gates.md) (`npm run verify`) → [design-system principles](design-system/principles.md) → the [FRD](product/FRD.md) requirement IDs for your task → the matching architecture page.
 - **Operator:** [deployment](operations/deployment.md) → [runbook](operations/runbook.md) → [architecture overview](architecture/overview.md) (components and ports).
 
 ## Product
@@ -39,7 +39,7 @@ Plain Markdown in the repo is the source of truth. Pages marked _Planned_ descri
 
 - [Setup](development/setup.md): clone to running app, env vars, the GitHub OAuth app, ports.
 - [Testing](development/testing.md): Vitest, Playwright, the stub API and fixtures.
-- [Quality gates](development/quality-gates.md): every script, what runs where (pre-commit / verify / CI / sweep), lychee.
+- [Quality gates](development/quality-gates.md): every script, what runs where (pre-commit / pre-push / verify / CI / sweep), lychee, gitleaks, branch protection and the coding-agent limits.
 - [Troubleshooting](development/troubleshooting.md): known local problems and their fixes.
 
 ## Operations
@@ -51,8 +51,9 @@ Plain Markdown in the repo is the source of truth. Pages marked _Planned_ descri
 
 New ADRs start from the [template](adr/template.md); see [CONTRIBUTING](../CONTRIBUTING.md#architecture-decision-records).
 
-| #    | Title                                                              | Status   | Date       |
-| ---- | ------------------------------------------------------------------ | -------- | ---------- |
-| 0001 | [LLM and embeddings provider](adr/0001-llm-embeddings-provider.md) | Accepted | 2026-09-20 |
-| 0002 | [Aurora design system](adr/0002-aurora-design-system.md)           | Accepted | 2026-10-08 |
-| 0003 | [Quality gates and tooling](adr/0003-quality-gates-and-tooling.md) | Accepted | 2026-10-08 |
+| #    | Title                                                                           | Status   | Date       |
+| ---- | ------------------------------------------------------------------------------- | -------- | ---------- |
+| 0001 | [LLM and embeddings provider](adr/0001-llm-embeddings-provider.md)              | Accepted | 2026-09-20 |
+| 0002 | [Aurora design system](adr/0002-aurora-design-system.md)                        | Accepted | 2026-10-08 |
+| 0003 | [Quality gates and tooling](adr/0003-quality-gates-and-tooling.md)              | Accepted | 2026-10-08 |
+| 0004 | [Agent limits and enforcement layers](adr/0004-agent-limits-and-enforcement.md) | Proposed | 2026-10-08 |

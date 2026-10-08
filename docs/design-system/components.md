@@ -51,6 +51,10 @@ Charts mark their root with `data-chart` so the responsive check can confirm the
 | `contrast()`   | WCAG contrast between two colour tokens (see [tokens](tokens.md#contrast-guarantees))                                                |
 | Motion exports | `AuroraMotionProvider`, `fadeUp`, `stagger`, `staggerItem`, `glowHover`, `countUp`, `useCountUp`, `motion` (see [motion](motion.md)) |
 
+## Screen states
+
+App screens compose the components above; they don't add styles of their own. The dashboard (`frontend/src/app/dashboard.tsx`) has four states: **ready** (rendered at `/`), **loading** (`Skeleton` panels in the ready layout, plus `SyncStatus` `syncing`), **empty** (`SyncStatus` `idle` and an explanation) and **error** (`SyncStatus` `error` and a retry link). The loading, empty and error states are shown under [Dashboard states](http://localhost:3000/design#dashboard-states) on `/design`. A new screen state goes there too, so the responsive and axe checks cover it.
+
 ## Adding a component
 
 Follow [Adding a component](../../packages/design-system/README.md#adding-a-component) in the package README, then add a row here.

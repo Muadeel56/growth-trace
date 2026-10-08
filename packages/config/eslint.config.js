@@ -35,8 +35,11 @@ const opacitySteps = [
 /** The single stylesheet import allowed outside the design system (frontend root layout). */
 const auroraStylesheet = '@growthtrace/design-system/styles.css';
 
-/** Styling rules that `eslint-disable` comments may not switch off. */
-const lockedRules = ['aurora/*', 'better-tailwindcss/*'];
+/** CLI scripts and test fixtures, where printing to the console is the point. */
+const consoleFiles = ['backend/scripts/**', 'packages/config/scripts/**', 'scripts/**', 'e2e/**'];
+
+/** Rules that `eslint-disable` comments may not switch off (styling, and no stray logging). */
+const lockedRules = ['aurora/*', 'better-tailwindcss/*', 'no-console'];
 
 export default tseslint.config(
   {
@@ -91,6 +94,11 @@ export default tseslint.config(
       ],
     },
   },
+
+  // No stray logging: app code logs through Fastify's logger (which redacts), never the
+  // console. Allowed only in CLI scripts; see consoleFiles.
+  { files: ['**/*.{ts,tsx,js,jsx,mjs,cjs}'], rules: { 'no-console': 'error' } },
+  { files: consoleFiles, rules: { 'no-console': 'off' } },
 
   { files: ['backend/**/*.{ts,js,mjs,cjs}'], languageOptions: { globals: globals.node } },
   { files: clientFiles, languageOptions: { globals: globals.browser } },

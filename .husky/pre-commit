@@ -1,3 +1,15 @@
+# Nothing is committed on main: every change lands through a PR.
+if [ "$(git branch --show-current)" = main ]; then
+  echo "pre-commit: refusing to commit on main. Create a branch first (feat/, fix/, docs/, chore/)." >&2
+  exit 1
+fi
+
+# Prettier + ESLint (including the Aurora styling rules and no-console) on staged files only.
+npx lint-staged
+
+# Secrets in the staged changes (gitleaks, .gitleaks.toml).
+sh scripts/check-secrets.sh
+
 # Responsive + accessibility check (Chromium), only when the commit touches UI code.
 # A dev server already running on port 3100 is reused.
 if git diff --cached --name-only | grep -qE '^(frontend|packages/design-system|e2e)/'; then

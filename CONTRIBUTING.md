@@ -28,13 +28,21 @@ Phase work follows `feat/phase-N-short-name`, matching the earlier phases. Every
 
 ## Git hooks
 
-`npm install` / `npm ci` installs the Husky hooks (`prepare: husky`). `.husky/pre-commit` runs checks only for what you staged:
+`npm install` / `npm ci` installs the Husky hooks (`prepare: husky`). Details are in [quality gates](docs/development/quality-gates.md#git-hooks).
 
+`.husky/pre-commit`:
+
+- **Refuses to commit on `main`.**
+- **Staged code:** Prettier and ESLint (Aurora styling rules, `no-console`) through lint-staged.
+- **Secrets:** gitleaks on the staged changes.
 - **UI paths** (`frontend/`, `packages/design-system/`, `e2e/`): `npm run test:responsive` (Playwright, Chromium).
 - **Markdown** (`*.md`): markdownlint and an offline link/anchor check (lychee) on the staged files.
-- Anything else: nothing.
 
-The docs check needs **lychee**, a Rust binary: `brew install lychee`, `cargo install lychee`, or the [release binary](https://github.com/lycheeverse/lychee/releases/latest) on your `PATH`. See [quality gates](docs/development/quality-gates.md#installing-lychee).
+`.husky/pre-push` runs knip (`npm run clean:check`).
+
+Two hook tools are binaries that npm doesn't install: **lychee** (`brew install lychee`, `cargo install lychee`, or the [release binary](https://github.com/lycheeverse/lychee/releases/latest)) and **gitleaks** (`brew install gitleaks`, or the [release binary](https://github.com/gitleaks/gitleaks/releases/latest)). Put them on your `PATH`; see [setup](docs/development/setup.md#prerequisites).
+
+Don't skip hooks with `--no-verify`. CI runs the same checks, and [branch protection](docs/development/quality-gates.md#branch-protection) won't merge a red PR.
 
 ## The gate
 
@@ -58,21 +66,21 @@ Open the PR against `main`. The [PR template](.github/pull_request_template.md) 
 - [ ] An architectural decision was made: an ADR is added.
 - [ ] UI changed: shown on `/design`, and screenshot baselines updated (`npm run test:responsive:update`).
 
-CI (`verify`, `docs`, `responsive`) must be green before merging.
+CI (`verify`, `docs`, `secrets`, `responsive`) must be green before merging; branch protection on `main` enforces it.
 
 ## Behaviour change ⇒ doc change
 
 If a PR changes behaviour, it updates the doc that describes that behaviour **in the same PR**. Use this table to find "the matching doc":
 
-| Change in…                            | Update…                                                                                                                                             |
-| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `backend/src/routes/**`               | `npm run docs:api` (generated)                                                                                                                      |
-| `prisma/schema.prisma`                | [architecture/data-model.md](docs/architecture/data-model.md), [multi-tenancy.md](docs/architecture/multi-tenancy.md)                               |
-| queues / workers                      | [architecture/sync-jobs.md](docs/architecture/sync-jobs.md), [operations/runbook.md](docs/operations/runbook.md)                                    |
-| embeddings / retrieval / prompts      | [architecture/rag-pipeline.md](docs/architecture/rag-pipeline.md)                                                                                   |
-| `packages/design-system/**`           | [design-system/\*.md](docs/design-system/principles.md)                                                                                             |
-| scripts, hooks, CI, `packages/config` | [development/quality-gates.md](docs/development/quality-gates.md), and [ADR 0003](docs/adr/0003-quality-gates-and-tooling.md) if a decision changes |
-| `docker-compose.yml`, `.env.example`  | [development/setup.md](docs/development/setup.md), [operations/deployment.md](docs/operations/deployment.md)                                        |
+| Change in…                                                     | Update…                                                                                                                                             |
+| -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `backend/src/routes/**`                                        | `npm run docs:api` (generated)                                                                                                                      |
+| `prisma/schema.prisma`                                         | [architecture/data-model.md](docs/architecture/data-model.md), [multi-tenancy.md](docs/architecture/multi-tenancy.md)                               |
+| queues / workers                                               | [architecture/sync-jobs.md](docs/architecture/sync-jobs.md), [operations/runbook.md](docs/operations/runbook.md)                                    |
+| embeddings / retrieval / prompts                               | [architecture/rag-pipeline.md](docs/architecture/rag-pipeline.md)                                                                                   |
+| `packages/design-system/**`                                    | [design-system/\*.md](docs/design-system/principles.md)                                                                                             |
+| scripts, hooks, CI, `packages/config`, `.claude/`, `AGENTS.md` | [development/quality-gates.md](docs/development/quality-gates.md), and [ADR 0003](docs/adr/0003-quality-gates-and-tooling.md) if a decision changes |
+| `docker-compose.yml`, `.env.example`                           | [development/setup.md](docs/development/setup.md), [operations/deployment.md](docs/operations/deployment.md)                                        |
 
 When a planned system gets built, also change its doc's `Status: Planned` line and replace the plan with what was actually built.
 

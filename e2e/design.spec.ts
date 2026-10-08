@@ -18,6 +18,7 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
         'Motion',
         'Primitives',
         'GrowthTrace components',
+        'Dashboard states',
       ]) {
         await expect(page.getByRole('heading', { level: 2, name })).toBeVisible();
       }

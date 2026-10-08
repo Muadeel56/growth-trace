@@ -7,7 +7,8 @@ This page takes you from a fresh clone to a running frontend, plus the infrastru
 - Docker and Docker Compose
 - Node 24 (`nvm use` reads it from `.nvmrc`) and npm 10+
 - A GitHub account, for the OAuth app below
-- Optional: [lychee](https://github.com/lycheeverse/lychee) for the link checks that `npm run verify` and the pre-commit hook run (see [quality gates](quality-gates.md#installing-lychee))
+- [lychee](https://github.com/lycheeverse/lychee) for the link checks that `npm run verify` and the pre-commit hook run (see [quality gates](quality-gates.md#installing-lychee))
+- [gitleaks](https://github.com/gitleaks/gitleaks) for the secret scan the pre-commit hook runs (see [quality gates](quality-gates.md#secret-scanning))
 
 ## 1. Environment file
 

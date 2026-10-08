@@ -34,6 +34,7 @@ import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 import { sampleActivity, sampleTrend } from '../../lib/sample-data';
+import { DashboardContent, type DashboardState, dashboardSync } from '../dashboard';
 import { primaryNav } from '../nav';
 import { MotionDemo, ToastDemo } from './demos';
 
@@ -169,6 +170,12 @@ const shadows: Record<keyof typeof tokens.shadow, string> = {
 };
 
 const syncStates: SyncState[] = ['idle', 'syncing', 'synced', 'error', 'offline'];
+
+const dashboardStates: { state: Exclude<DashboardState, 'ready'>; title: string }[] = [
+  { state: 'loading', title: 'Loading' },
+  { state: 'empty', title: 'Empty' },
+  { state: 'error', title: 'Error' },
+];
 
 function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
@@ -589,6 +596,19 @@ export default function DesignPage() {
               md, and a skip link (press Tab on load).
             </p>
           </Subsection>
+        </Section>
+
+        <Section id="dashboard-states" title="Dashboard states">
+          <p className="max-w-prose text-body-sm text-muted">
+            The dashboard renders the ready state at /. These are the others, with the header sync
+            status each one pairs with.
+          </p>
+          {dashboardStates.map(({ state, title }) => (
+            <Subsection key={state} title={title}>
+              <SyncStatus {...dashboardSync[state]} />
+              <DashboardContent state={state} />
+            </Subsection>
+          ))}
         </Section>
       </div>
     </AppShell>
