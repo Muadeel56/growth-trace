@@ -4,6 +4,11 @@ The only source of styling in GrowthTrace. Feature code arranges these component
 never styles them. Lint, Stylelint and a stray-stylesheet check enforce this, so styling
 outside the system fails `npm run verify`.
 
+This README holds the **how-to** (adding tokens and components, responsive rules,
+enforcement, allowlist policy). Reference and rationale live in
+[docs/design-system/](../../docs/design-system/principles.md): principles, tokens,
+components, motion and the responsive check.
+
 ```ts
 import { Button, Panel, StatTile } from '@growthtrace/design-system';
 import { tokens } from '@growthtrace/design-system/tokens'; // charts, Motion, /design
@@ -12,29 +17,18 @@ import '@growthtrace/design-system/styles.css';
 ```
 
 Browse everything at **`/design`** (`npm run dev -w @growthtrace/frontend`, then open
-http://localhost:3000/design). The route returns 404 in production unless
+<http://localhost:3000/design>). The route returns 404 in production unless
 `NEXT_PUBLIC_ENABLE_DESIGN_ROUTE=1`.
 
 ## Tokens
 
 `src/tokens/tokens.css` defines every token in a Tailwind v4 `@theme` block that starts
-with `--*: initial`, which wipes all Tailwind defaults. Only Aurora tokens generate classes,
-so `bg-red-500`, `p-37`, `rounded-3xl` and `shadow-2xl` don't exist.
+with `--*: initial`, so only Aurora tokens generate classes. `src/tokens/tokens.ts` mirrors
+the CSS for JavaScript (charts, Motion presets, `/design`).
 
-| Group       | Classes                                                                        | Notes                                                                                |
-| ----------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| Colour      | `bg-surface`, `text-muted`, `border-border`, `bg-accent-gradient`…             | OKLCH. Dark-first; a light theme would redefine the same names under `[data-theme]`. |
-| Type        | `text-display`, `text-h1`…`text-caption`, `font-sans`, `font-semibold`         | Each size carries its line-height and weight. Display, h1, h2 are fluid (`clamp`).   |
-| Spacing     | `p-4`, `gap-2`, `size-12`… (steps 0–4, 6, 8, 10, 12, 16, 20, 24), `size-touch` | 4px base. No `--spacing` multiplier, so off-scale steps don't exist. `touch` = 44px. |
-| Widths      | `w-sidebar`, `max-w-prose`, `max-w-page`, `max-w-2xs/xs/sm/md/lg`              | `--container-*`. Also the container-query sizes: `@2xs:`, `@xs:`, `@sm:`…            |
-| Opacity     | `opacity-50`, `bg-surface/80` (steps 0, 10, 20 … 100)                          | Only these steps; `/37` or `opacity-37` fail lint.                                   |
-| Radii       | `rounded-sm/md/lg/full`                                                        |                                                                                      |
-| Elevation   | `shadow-glow-sm/md/accent`, `backdrop-blur-sm/md`, `blur-aurora`               | Glows, not drop shadows.                                                             |
-| Motion      | `duration-fast/base/slow`, `ease-out-expo/spring`, `animate-*`                 | Wrap CSS animations in `motion-ok:` so they stop for reduced motion.                 |
-| Breakpoints | `xs: sm: md: lg: xl: 2xl:`                                                     | 360 / 640 / 768 / 1024 / 1280 / 1536px.                                              |
-| Z-index     | `z-base`, `z-raised`, `z-nav`, `z-overlay`, `z-dialog`, `z-toast`, `z-tooltip` | Custom utilities; bare `z-50` is banned.                                             |
-
-`src/tokens/tokens.ts` mirrors the CSS for JavaScript (charts, Motion presets, `/design`).
+The token groups, naming, colour roles and contrast guarantees are documented in
+[docs/design-system/tokens.md](../../docs/design-system/tokens.md). This README keeps the
+procedures.
 
 ### Adding a token
 

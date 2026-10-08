@@ -1,0 +1,132 @@
+name: Daily sweep
+
+# Slow or network-dependent checks that don't belong on every PR: external link rot,
+# plus a full re-run of the docs gates against main. A failure opens (or updates) one
+# issue labelled `documentation`, so a red sweep is visible without watching Actions.
+#
+# Adding a sweep job: add the job below, then add its id to `report.needs` and a line for
+# it in the "Build issue body" step. See docs/development/quality-gates.md.
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: sweep
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  # Keep in sync with ci.yml and docs/development/quality-gates.md.
+  LYCHEE_VERSION: v0.24.2
+
+jobs:
+  markdownlint:
+    name: markdownlint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint:md
+
+  links:
+    name: links (external)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore lychee cache
+        uses: actions/cache@v4
+        with:
+          path: .lycheecache
+          key: lychee-${{ github.run_id }}
+          restore-keys: lychee-
+      # Online run: every external URL plus relative links and #anchors.
+      - uses: lycheeverse/lychee-action@v2
+        with:
+          lycheeVersion: ${{ env.LYCHEE_VERSION }}
+          args: --include-fragments --cache --max-cache-age 1d --no-progress .
+          output: lychee/report.md
+          fail: true
+          jobSummary: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lychee-report
+          path: lychee/report.md
+          retention-days: 14
+
+  api-docs:
+    name: docs:api:check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run docs:api:check
+
+  report:
+    name: report failure
+    needs: [markdownlint, links, api-docs]
+    if: failure()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: lychee-report
+          path: lychee
+      - name: Build issue body
+        env:
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          MARKDOWNLINT: ${{ needs.markdownlint.result }}
+          LINKS: ${{ needs.links.result }}
+          API_DOCS: ${{ needs.api-docs.result }}
+        run: |
+          {
+            echo "The [daily sweep]($RUN_URL) failed on $(date -u +%F)."
+            echo
+            echo "| Check | Result |"
+            echo "| --- | --- |"
+            echo "| markdownlint | $MARKDOWNLINT |"
+            echo "| links (external) | $LINKS |"
+            echo "| docs:api:check | $API_DOCS |"
+            echo
+            echo "See docs/development/quality-gates.md for how to reproduce each check locally."
+            if [ -s lychee/report.md ]; then
+              echo
+              echo "## Link report"
+              echo
+              cat lychee/report.md
+            fi
+          } > sweep-report.md
+      - name: Find open sweep issue
+        id: existing
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          number=$(gh issue list --state open --label documentation \
+            --search 'in:title "Daily sweep failed"' --json number --jq '.[0].number // empty')
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+      - uses: peter-evans/create-issue-from-file@v5
+        with:
+          title: Daily sweep failed
+          content-filepath: sweep-report.md
+          labels: documentation
+          issue-number: ${{ steps.existing.outputs.number }}

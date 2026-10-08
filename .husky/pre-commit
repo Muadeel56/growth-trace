@@ -3,3 +3,12 @@
 if git diff --cached --name-only | grep -qE '^(frontend|packages/design-system|e2e)/'; then
   npm run test:responsive
 fi
+
+# Docs lint + offline link/anchor check, only for staged Markdown files.
+md_files=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.md$' || true)
+if [ -n "$md_files" ]; then
+  # shellcheck disable=SC2086 # word-splitting the file list is intended
+  npx markdownlint-cli2 $md_files
+  # shellcheck disable=SC2086
+  scripts/check-links.sh $md_files
+fi

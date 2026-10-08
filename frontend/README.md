@@ -1,7 +1,7 @@
 # GrowthTrace Dashboard
 
 Next.js (App Router) frontend. Product pages land in later phases; see
-[../BRD.md](../BRD.md) and [../FRD.md](../FRD.md).
+[BRD](../docs/product/BRD.md) and [FRD](../docs/product/FRD.md).
 
 ```bash
 npm run dev -w @growthtrace/frontend   # http://localhost:3000

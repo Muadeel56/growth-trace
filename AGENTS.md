@@ -2,7 +2,9 @@
 
 Monorepo (npm workspaces): `frontend/` (Next.js App Router), `backend/` (Fastify),
 `packages/design-system/` (Aurora UI), `packages/config/` (shared TS/ESLint/Prettier/Stylelint).
-Requirements live in [BRD.md](BRD.md) and [FRD.md](FRD.md).
+Requirements live in [BRD](docs/product/BRD.md) and [FRD](docs/product/FRD.md).
+All other docs (architecture, API, design system, development, operations, ADRs) are
+listed in the [docs map](docs/index.md); contribution rules are in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Before you finish
 
