@@ -132,6 +132,30 @@ const noOffScaleOpacity = {
   },
 };
 
+/** `max-md:`, `max-[600px]:`, `@max-sm:`: any desktop-first (max-width) variant. */
+const MAX_VARIANT = /(^|:)@?max-[^:]*:/;
+
+const noDesktopFirst = {
+  meta: {
+    type: 'problem',
+    docs: { description: 'Ban max-* breakpoint variants; style mobile-first with sm:, md:...' },
+    messages: {
+      maxVariant:
+        '"{{token}}" is desktop-first. Style the phone layout with base classes and add to it with sm:, md:, lg:.',
+    },
+    schema: [],
+  },
+  create(context) {
+    return visitStrings((text, node) => {
+      for (const token of text.split(/\s+/)) {
+        if (MAX_VARIANT.test(utilityOf(token).variants)) {
+          context.report({ node, messageId: 'maxVariant', data: { token } });
+        }
+      }
+    });
+  },
+};
+
 const RAW_COLOR =
   /(?:^|[^\w&])#(?:[0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{3,4})\b|\b(?:rgba?|hsla?|oklch|oklab|lab|lch|hwb|color-mix)\(/i;
 
@@ -255,6 +279,7 @@ export default {
   rules: {
     'no-arbitrary-values': noArbitraryValues,
     'no-bare-z-index': noBareZIndex,
+    'no-desktop-first': noDesktopFirst,
     'no-off-scale-opacity': noOffScaleOpacity,
     'no-raw-colors': noRawColors,
     'no-style-prop': noStyleProp,

@@ -15,9 +15,15 @@ export type SparklineProps = {
 export function Sparkline({ data, label, tone = 'accent' }: SparklineProps) {
   const points = data.map((value, index) => ({ index, value }));
   return (
-    <div role="img" aria-label={label} className="h-10 w-full">
+    <div role="img" aria-label={label} data-chart className="h-10 w-full">
       <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 160, height: 40 }}>
-        <LineChart data={points} margin={{ top: 4, right: 2, bottom: 4, left: 2 }}>
+        {/* No keyboard layer: the wrapper's role="img" label already describes the trend, and
+            a focusable <svg> would add a pointless tab stop. */}
+        <LineChart
+          data={points}
+          margin={{ top: 4, right: 2, bottom: 4, left: 2 }}
+          accessibilityLayer={false}
+        >
           <Line
             type="monotone"
             dataKey="value"

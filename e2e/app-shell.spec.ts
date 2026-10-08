@@ -1,21 +1,32 @@
 import { expect, test } from '@playwright/test';
 
-import { expectNoHorizontalScroll } from './helpers';
+import { expectNoOverflow } from './helpers';
+import { MD, viewports } from './viewports';
 
-test('shows a bottom tab bar below md and a sidebar from md up', async ({ page, viewport }) => {
-  await page.goto('/');
-  const sidebar = page.locator('nav[data-nav="sidebar"]');
-  const bottomBar = page.locator('nav[data-nav="bottom"]');
+for (const vp of viewports) {
+  test.describe(`app shell @ ${vp.name}`, () => {
+    test.use({ viewport: { width: vp.width, height: vp.height } });
 
-  if (viewport!.width < 768) {
-    await expect(bottomBar).toBeVisible();
-    await expect(sidebar).toBeHidden();
-  } else {
-    await expect(sidebar).toBeVisible();
-    await expect(bottomBar).toBeHidden();
-  }
-  await expectNoHorizontalScroll(page);
-});
+    test('shows a bottom tab bar below md and a sidebar from md up', async ({
+      page,
+      browserName,
+    }) => {
+      test.skip(!!vp.chromiumOnly && browserName !== 'chromium', 'Chromium-only width');
+      await page.goto('/');
+      const sidebar = page.locator('nav[data-nav="sidebar"]');
+      const bottomBar = page.locator('nav[data-nav="bottom"]');
+
+      if (vp.width < MD) {
+        await expect(bottomBar).toBeVisible();
+        await expect(sidebar).toBeHidden();
+      } else {
+        await expect(sidebar).toBeVisible();
+        await expect(bottomBar).toBeHidden();
+      }
+      await expectNoOverflow(page);
+    });
+  });
+}
 
 test('skip link moves focus to the main content', async ({ page }) => {
   await page.goto('/');

@@ -2,7 +2,7 @@
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "workspaces": {
     ".": {
-      "entry": ["e2e/**/*.spec.ts"],
+      "entry": ["e2e/**/*.spec.ts", "e2e/fixtures/server.ts"],
       "project": ["*.{js,ts}", "e2e/**/*.ts"]
     },
     "packages/config": {
@@ -14,7 +14,8 @@
       "project": ["src/**/*.ts"]
     },
     "frontend": {
-      "project": ["src/**/*.{ts,tsx}"]
+      "project": ["src/**/*.{ts,tsx}"],
+      "entry": ["src/lib/api.ts"]
     },
     "packages/design-system": {
       "entry": ["src/**/*.test.ts"],

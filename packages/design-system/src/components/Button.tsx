@@ -19,9 +19,11 @@ const button = cva(
         ghost: 'border border-border bg-transparent text-text hover:bg-surface-raised',
         danger: 'bg-danger text-on-danger hover:shadow-glow-sm',
       },
+      // Every size is a 44px tap target on touch layouts (phones and portrait tablets);
+      // sm and md go back to their compact height from lg up.
       size: {
-        sm: 'h-8 px-3 text-body-sm',
-        md: 'h-10 px-4 text-body',
+        sm: 'min-h-touch px-3 text-body-sm lg:h-8 lg:min-h-0',
+        md: 'min-h-touch px-4 text-body lg:h-10 lg:min-h-0',
         lg: 'h-12 px-6 text-body-lg',
       },
     },

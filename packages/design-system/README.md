@@ -24,9 +24,9 @@ so `bg-red-500`, `p-37`, `rounded-3xl` and `shadow-2xl` don't exist.
 | Group       | Classes                                                                        | Notes                                                                                |
 | ----------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
 | Colour      | `bg-surface`, `text-muted`, `border-border`, `bg-accent-gradient`…             | OKLCH. Dark-first; a light theme would redefine the same names under `[data-theme]`. |
-| Type        | `text-display`, `text-h1`…`text-caption`, `font-sans`, `font-semibold`         | Each size carries its line-height and weight.                                        |
-| Spacing     | `p-4`, `gap-2`, `size-12`… (steps 0–4, 6, 8, 10, 12, 16, 20, 24)               | 4px base. No `--spacing` multiplier, so off-scale steps don't exist.                 |
-| Widths      | `w-sidebar`, `max-w-prose`, `max-w-page`, `max-w-md`, `max-w-lg`               | `--container-*`.                                                                     |
+| Type        | `text-display`, `text-h1`…`text-caption`, `font-sans`, `font-semibold`         | Each size carries its line-height and weight. Display, h1, h2 are fluid (`clamp`).   |
+| Spacing     | `p-4`, `gap-2`, `size-12`… (steps 0–4, 6, 8, 10, 12, 16, 20, 24), `size-touch` | 4px base. No `--spacing` multiplier, so off-scale steps don't exist. `touch` = 44px. |
+| Widths      | `w-sidebar`, `max-w-prose`, `max-w-page`, `max-w-2xs/xs/sm/md/lg`              | `--container-*`. Also the container-query sizes: `@2xs:`, `@xs:`, `@sm:`…            |
 | Opacity     | `opacity-50`, `bg-surface/80` (steps 0, 10, 20 … 100)                          | Only these steps; `/37` or `opacity-37` fail lint.                                   |
 | Radii       | `rounded-sm/md/lg/full`                                                        |                                                                                      |
 | Elevation   | `shadow-glow-sm/md/accent`, `backdrop-blur-sm/md`, `blur-aurora`               | Glows, not drop shadows.                                                             |
@@ -53,8 +53,40 @@ so `bg-red-500`, `p-37`, `rounded-3xl` and `shadow-2xl` don't exist.
 3. Interactive elements use `focusRing` (a Playwright test checks it renders on `bg`,
    `surface` and `surface-raised`). Animations come from `src/motion/presets.ts` or
    `motion-ok:` CSS animations, so reduced motion is respected.
-4. Add every variant and state to `/design`. Playwright runs axe and a no-horizontal-scroll
-   check there at 375, 768 and 1440px, with and without reduced motion.
+4. Build it mobile-first and touch-sized (see [Responsive rules](#responsive-rules)).
+5. Add every variant and state to `/design`. Playwright checks every route at every width
+   from 320px to 3840px (`e2e/viewports.ts`): no sideways scroll, nothing sticking out or
+   clipped, 44px tap targets on touch layouts, charts that fit, and zero axe violations.
+
+## Responsive rules
+
+- **Mobile-first.** Base classes style the phone layout; `sm:`, `md:`, `lg:`… add to it.
+  `max-*` variants (`max-md:`, `@max-sm:`) are banned by `aurora/no-desktop-first`.
+- **Fluid headings.** `text-display`, `text-h1` and `text-h2` use `clamp(min, rem + vw, max)`,
+  so they shrink on phones without breakpoints. The `rem` part keeps browser zoom working
+  (WCAG 1.4.4). `text-h3` and smaller are fixed.
+- **Container queries.** `Panel` is a query container (`@container`) by default, so its
+  children adapt to the panel's width with `@2xs:` (16rem), `@xs:` (20rem), `@sm:` (24rem),
+  `@md:`, `@lg:`… An element can't query itself, so `Panel`'s own padding stays
+  viewport-based. Pass `container={false}` when a panel sits inside a content-sized parent
+  (`w-max`, `inline-flex`): `container-type: inline-size` would collapse it to zero width.
+  `StatTile` is the reference example: it stacks in narrow slots and goes to one row from `@xs`.
+- **Touch targets.** On touch layouts (below `lg`, i.e. phones and portrait tablets) every
+  interactive element is at least 44×44px: use `min-h-touch`, `min-w-touch` or `size-touch`,
+  and go compact from `lg:` up (`Button` and `Input` do this). Icon-only buttons such as the
+  `Dialog` and `Toast` close buttons are `size-touch` with a 16px icon.
+- **Tap-target exemptions.** Only for composite widgets where 44px cells are impossible and a
+  larger alternative exists. Mark the element `data-tap-exempt="<reason>"` (the reason is
+  required; the check fails on an empty value) and list it here:
+  - `ActivityHeatmap` cells, `composite-grid`: the grid is one tab stop with roving focus
+    (arrow keys), and the summary text above it carries the same information.
+
+  Links inside running text (`p a`) are exempt automatically (WCAG 2.5.8 inline exception).
+
+- **Charts** mark their root `data-chart` and must fit their container. Wide charts scroll
+  inside their own `overflow-x-auto` box (`ActivityHeatmap` starts scrolled to the latest week).
+- **Tables** use `DataTable`: a semantic `<table>` from `md` up and a list of cards (one `<dl>`
+  per row) below `md`. Only one is in the accessibility tree at a time.
 
 ## Enforcement
 
@@ -64,6 +96,7 @@ so `bg-red-500`, `p-37`, `rounded-3xl` and `shadow-2xl` don't exist.
 | `aurora/no-arbitrary-values`            | `w-[37px]`, `bg-[#f00]`, `[mask-type:alpha]`, `p-(--x)`, `bg-accent-from/[0.37]`.  |
 | `aurora/no-off-scale-opacity`           | `bg-surface/37`, `opacity-37`: only the `--opacity-*` steps from tokens.css.       |
 | `aurora/no-bare-z-index`                | `z-50` and other numeric layers.                                                   |
+| `aurora/no-desktop-first`               | `max-md:hidden`, `@max-sm:grid-cols-1`: desktop-first (max-width) variants.        |
 | `aurora/no-style-prop`                  | `style={{…}}`.                                                                     |
 | `aurora/no-raw-colors`                  | `'#ff0000'`, `rgb(`, `hsl(`, `oklch(`… in `.tsx`.                                  |
 | `aurora/no-inline-motion`               | `animate={{…}}`, `transition={{…}}` and other inline Motion objects.               |

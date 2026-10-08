@@ -35,8 +35,9 @@ export function StatTile({
   return (
     <Panel className={cn('flex flex-col gap-2', className)}>
       <p className="text-body-sm text-muted">{label}</p>
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <p className="text-h1 text-text tabular-nums">
+      {/* Stacks in narrow slots; from @xs (320px of tile) value and delta share a row. */}
+      <div className="flex flex-col items-start gap-2 @xs:flex-row @xs:items-end @xs:justify-between @xs:gap-3">
+        <p className="text-h1 text-text tabular-nums @xs:text-display">
           <span aria-hidden>{format(shown)}</span>
           <span className="sr-only">{format(value)}</span>
         </p>
