@@ -14,5 +14,6 @@
     "frontend/AGENTS.md",
     // A single `@AGENTS.md` import line for Claude Code, not a document.
     "frontend/CLAUDE.md",
+    "backend/CLAUDE.md",
   ],
 }

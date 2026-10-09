@@ -25,38 +25,62 @@ Every tool is a root devDependency, and every script runs from the repo root. Sh
 | `npm run test:responsive:all`    | The same in Chromium, WebKit and Firefox                                                             |
 | `npm run test:responsive:update` | Regenerates screenshot baselines in the Playwright Docker image                                      |
 | `npm run clean:check`            | knip: unused files, exports and dependencies                                                         |
+| `npm run check:secrets`          | gitleaks on staged changes; `-- --all` scans the whole history ([secret scanning](#secret-scanning)) |
 | `npm run verify`                 | The gate (below), stopping at the first failure                                                      |
 
 `verify` runs, in this order: `format:check` → `lint` → `lint:md` → `lint:styles` → `check:styles` → `check:links` → `typecheck` → `test` → `docs:api:check` → `test:responsive` → `clean:check`. The fast, static checks come first.
 
 ## What runs where
 
-| Check                          | Pre-commit            | `verify` | CI (`ci.yml`)            | Daily sweep (`sweep.yml`) |
-| ------------------------------ | --------------------- | -------- | ------------------------ | ------------------------- |
-| Prettier                       |                       | ✓        | ✓ `verify`               |                           |
-| ESLint (+ Aurora rules)        |                       | ✓        | ✓ `verify`               |                           |
-| markdownlint                   | ✓ staged `.md` files  | ✓        | ✓ `verify`, `docs`       | ✓                         |
-| Stylelint, `check:styles`      |                       | ✓        | ✓ `verify`               |                           |
-| Links + anchors, offline       | ✓ staged `.md` files  | ✓        | ✓ `verify`, `docs`       |                           |
-| Links, external URLs           |                       |          |                          | ✓                         |
-| TypeScript                     |                       | ✓        | ✓ `verify`               |                           |
-| Vitest                         |                       | ✓        | ✓ `verify`               |                           |
-| `docs:api:check`               |                       | ✓        | ✓ `verify`, `docs`       | ✓                         |
-| Playwright + axe, Chromium     | ✓ if UI paths staged¹ | ✓        | ✓ `verify`, `responsive` |                           |
-| Playwright, WebKit + Firefox   |                       |          | ✓ `responsive`           |                           |
-| Screenshot diffs (`PW_VISUAL`) |                       |          | ✓ `responsive`           |                           |
-| knip                           |                       | ✓        | ✓ `verify`               |                           |
+| Check                          | Pre-commit            | Pre-push | `verify` | CI (`ci.yml`)            | Daily sweep (`sweep.yml`) |
+| ------------------------------ | --------------------- | -------- | -------- | ------------------------ | ------------------------- |
+| Not on `main`                  | ✓                     |          |          | branch protection²       |                           |
+| Prettier                       | ✓ staged files        |          | ✓        | ✓ `verify`               |                           |
+| ESLint (+ Aurora, no-console)  | ✓ staged files        |          | ✓        | ✓ `verify`               |                           |
+| Secrets (gitleaks)             | ✓ staged changes      |          |          | ✓ `secrets` (history)    |                           |
+| markdownlint                   | ✓ staged `.md` files  |          | ✓        | ✓ `verify`, `docs`       | ✓                         |
+| Stylelint, `check:styles`      |                       |          | ✓        | ✓ `verify`               |                           |
+| Links + anchors, offline       | ✓ staged `.md` files  |          | ✓        | ✓ `verify`, `docs`       |                           |
+| Links, external URLs           |                       |          |          |                          | ✓                         |
+| TypeScript                     |                       |          | ✓        | ✓ `verify`               |                           |
+| Vitest                         |                       |          | ✓        | ✓ `verify`               |                           |
+| `docs:api:check`               |                       |          | ✓        | ✓ `verify`, `docs`       | ✓                         |
+| Playwright + axe, Chromium     | ✓ if UI paths staged¹ |          | ✓        | ✓ `verify`, `responsive` |                           |
+| Playwright, WebKit + Firefox   |                       |          |          | ✓ `responsive`           |                           |
+| Screenshot diffs (`PW_VISUAL`) |                       |          |          | ✓ `responsive`           |                           |
+| knip                           |                       | ✓        | ✓        | ✓ `verify`               |                           |
 
-¹ UI paths: `frontend/`, `packages/design-system/`, `e2e/`. A commit that touches neither UI paths nor `.md` files runs no hook checks at all.
+¹ UI paths: `frontend/`, `packages/design-system/`, `e2e/`.
+² Hooks can be skipped locally (`--no-verify`); [branch protection](#branch-protection) is the layer that can't be.
 
-## Pre-commit hook
+## Git hooks
 
-`.husky/pre-commit` is installed by `npm install` / `npm ci` (`prepare: husky`). It has two blocks, each scoped by the staged paths:
+Husky installs them on `npm install` / `npm ci` (`prepare: husky`).
 
-1. **Responsive:** `npm run test:responsive` when anything under `frontend/`, `packages/design-system/` or `e2e/` is staged. A dev server already running on port 3100 is reused.
-2. **Docs:** for staged `*.md` files only, `markdownlint-cli2 <files>` and then `scripts/check-links.sh <files>` (lychee, offline, with `--include-fragments`). A broken relative link or heading anchor blocks the commit.
+**`.husky/pre-commit`**, in order, stopping at the first failure:
 
-To skip the hook in an emergency, use `git commit --no-verify`. CI runs the same checks, so it's only a delay.
+1. **Not on `main`:** refuses to commit on `main`.
+2. **lint-staged:** Prettier (`--write`) and ESLint (`--max-warnings=0`, so the Aurora rules and `no-console`) on the staged files only. The config is the `lint-staged` key in the root `package.json`.
+3. **Secrets:** `scripts/check-secrets.sh` runs `gitleaks git --staged` ([secret scanning](#secret-scanning)).
+4. **Responsive:** `npm run test:responsive` when anything under `frontend/`, `packages/design-system/` or `e2e/` is staged. A dev server already running on port 3100 is reused.
+5. **Docs:** for staged `*.md` files only, `markdownlint-cli2 <files>` and then `scripts/check-links.sh <files>` (lychee, offline, with `--include-fragments`). A broken relative link or heading anchor blocks the commit.
+
+**`.husky/pre-push`** runs knip (`npm run clean:check`). It takes too long for every commit, and CI `verify` runs it again.
+
+Don't skip hooks (`--no-verify`, `HUSKY=0`). CI runs the same checks and branch protection blocks the merge, so skipping only moves the failure later. Agents may not skip them at all ([AGENTS.md](../../AGENTS.md#-never)).
+
+## No console output
+
+ESLint's `no-console` is an error everywhere except CLI scripts (`backend/scripts/`, `packages/config/scripts/`, `scripts/`, `e2e/`): the `consoleFiles` allowlist in `packages/config/eslint.config.js`. The backend logs through Fastify's logger instead. Like the styling rules it is in `lockedRules`, so an `eslint-disable` comment can't switch it off.
+
+## Secret scanning
+
+[gitleaks](https://github.com/gitleaks/gitleaks) looks for tokens, keys and passwords using its default rules plus `.gitleaks.toml`, which allowlists only the env example file, the lockfile, screenshot baselines and the generated OpenAPI file.
+
+- **Pre-commit:** `scripts/check-secrets.sh` scans the staged changes.
+- **CI `secrets` job:** checks out the full history and runs `scripts/check-secrets.sh --all`, so a secret that was committed and later deleted still fails.
+
+gitleaks is a Go binary, so `npm ci` doesn't install it. The script fails with install steps when it's missing ([troubleshooting](troubleshooting.md#gitleaks-not-installed)). CI pins **8.30.1** (`GITLEAKS_VERSION` in `ci.yml`).
 
 ## Installing lychee
 
@@ -86,6 +110,51 @@ The decision was to keep `check:links` **inside** `verify`, failing clearly when
 - **`verify`:** installs Playwright Chromium and lychee, then runs `npm run verify`. On failure it uploads the Playwright report.
 - **`docs`:** `lint:md`, `docs:api:check` and offline lychee (`lycheeverse/lychee-action`). It finishes in about a minute, so docs-only PRs get quick feedback.
 - **`responsive`:** Playwright per browser inside `mcr.microsoft.com/playwright:v1.63.0-noble`, with screenshot diffs.
+- **`secrets`:** gitleaks over the full git history.
+
+## Branch protection
+
+Git hooks run on the contributor's machine and can be skipped, so `main` is protected on GitHub. It is the only layer that `--no-verify` can't get around:
+
+- Changes land through a PR; direct pushes are rejected.
+- Required checks: `verify`, `docs`, `secrets`, `responsive (chromium)`, `responsive (webkit)` and `responsive (firefox)`, with the branch up to date with `main`.
+- Force-pushes and branch deletion are blocked, and the rule applies to admins too.
+
+To apply or restore it (needs repo admin):
+
+```bash
+gh api -X PUT repos/Muadeel56/growth-trace/branches/main/protection --input - <<'JSON'
+{
+  "required_status_checks": {
+    "strict": true,
+    "contexts": ["verify", "docs", "secrets", "responsive (chromium)", "responsive (webkit)", "responsive (firefox)"]
+  },
+  "enforce_admins": true,
+  "required_pull_request_reviews": { "required_approving_review_count": 0 },
+  "restrictions": null,
+  "allow_force_pushes": false,
+  "allow_deletions": false
+}
+JSON
+```
+
+Check it with `gh api repos/Muadeel56/growth-trace/branches/main/protection`. When a CI job is added or renamed, update `contexts` here and on GitHub.
+
+## Coding-agent limits
+
+Agents follow [AGENTS.md](../../AGENTS.md); Claude Code also loads `.claude/settings.json`. The layering and the reasons for it are in [ADR 0004](../adr/0004-agent-limits-and-enforcement.md).
+
+| Layer                                 | Binds                 | What it enforces                                                                                                       |
+| ------------------------------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `AGENTS.md` (root, frontend, backend) | Every agent, by trust | Always / ask first / never, scope guardrails, definition of done                                                       |
+| `.claude/settings.json` deny, allow   | Claude Code           | No reading env files, force-pushes, skipped hooks, pushes to `main` or `rm -rf`; safe npm scripts run without a prompt |
+| `.claude/hooks/guard-bash.sh`         | Claude Code           | The same limits parsed per command segment, so `git -c x=y push -f`, `push origin +main` and `HUSKY=0` are caught too  |
+| `.claude/hooks/lint-file.sh`          | Claude Code           | Prettier and ESLint on each edited file, with errors returned straight away                                            |
+| `.claude/hooks/stop-gate.sh`          | Claude Code           | `npm run lint` and `npm run typecheck` before Claude hands back                                                        |
+| Git hooks                             | Everyone, skippable   | The pre-commit and pre-push checks above                                                                               |
+| CI and branch protection              | Everyone              | Everything; nothing merges red                                                                                         |
+
+The hook scripts are POSIX `sh` and need `jq`. `guard-bash.sh` is tested in `packages/config/test/guard-bash.test.ts`; add a case there when you change it. It reads command text, so it also blocks a command that only mentions a blocked pattern (for example a heredoc whose body names an env file); write such content with an editor tool instead.
 
 ## Daily sweep
 

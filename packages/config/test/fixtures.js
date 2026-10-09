@@ -163,6 +163,24 @@ export const mustFail = [
     rule: '@eslint-community/eslint-comments/no-use',
     code: `/* eslint aurora/no-style-prop: off */\nexport const A = () => <div style={{ color: 'red' }} />;`,
   },
+  {
+    name: 'console.log in app code',
+    file: 'frontend/src/lib/fixture.ts',
+    rule: 'no-console',
+    code: `export const f = () => console.log('x');`,
+  },
+  {
+    name: 'console.error in the backend',
+    file: 'backend/src/fixture.ts',
+    rule: 'no-console',
+    code: `export const f = () => console.error('x');`,
+  },
+  {
+    name: 'eslint-disable of no-console',
+    file: 'backend/src/fixture.ts',
+    rule: '@eslint-community/eslint-comments/no-restricted-disable',
+    code: `// eslint-disable-next-line no-console\nexport const f = () => console.log('x');`,
+  },
 ];
 
 /** Code that must produce no styling errors at all. */
@@ -226,5 +244,10 @@ export const mustPass = [
     name: 'in-page anchor',
     file: feature,
     code: `export const A = () => <a href="#main-content">Skip</a>;`,
+  },
+  {
+    name: 'console output in a CLI script',
+    file: 'backend/scripts/fixture.ts',
+    code: `console.log('wrote docs/api/openapi.json');`,
   },
 ];

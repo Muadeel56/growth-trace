@@ -1,0 +1,3 @@
+# Unused files, exports and dependencies (knip). Too slow for every commit; CI `verify`
+# runs it too.
+npm run clean:check

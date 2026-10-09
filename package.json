@@ -29,7 +29,8 @@
     "clean:check": "knip",
     "docs:api": "npm run docs:api -w @growthtrace/backend",
     "docs:api:check": "npm run docs:api:check -w @growthtrace/backend",
-    "verify": "npm run format:check && npm run lint && npm run lint:md && npm run lint:styles && npm run check:styles && npm run check:links && npm run typecheck && npm run test && npm run docs:api:check && npm run test:responsive && npm run clean:check"
+    "verify": "npm run format:check && npm run lint && npm run lint:md && npm run lint:styles && npm run check:styles && npm run check:links && npm run typecheck && npm run test && npm run docs:api:check && npm run test:responsive && npm run clean:check",
+    "check:secrets": "sh scripts/check-secrets.sh"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
@@ -38,10 +39,18 @@
     "eslint": "^9.36.0",
     "husky": "^9.1.7",
     "knip": "^5.64.1",
+    "lint-staged": "^16.4.0",
     "markdownlint-cli2": "^0.23.3",
     "prettier": "^3.6.2",
     "stylelint": "^17.16.0",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,mjs,cjs}": [
+      "prettier --write",
+      "eslint --max-warnings=0 --no-warn-ignored"
+    ],
+    "*.{css,md,json,jsonc,yml,yaml}": "prettier --write --ignore-unknown"
   }
 }

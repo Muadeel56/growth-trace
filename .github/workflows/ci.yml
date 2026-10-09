@@ -12,6 +12,8 @@ concurrency:
 env:
   # Keep in sync with sweep.yml and docs/development/quality-gates.md.
   LYCHEE_VERSION: v0.24.2
+  # Keep in sync with docs/development/quality-gates.md.
+  GITLEAKS_VERSION: 8.30.1
 
 jobs:
   verify:
@@ -63,6 +65,23 @@ jobs:
           args: --offline --include-fragments --no-progress .
           fail: true
           jobSummary: true
+
+  secrets:
+    name: secrets
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history: a secret committed and then deleted is still leaked.
+          fetch-depth: 0
+      - name: Install gitleaks
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | tar xz -C "$HOME/.local/bin" gitleaks
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - run: sh scripts/check-secrets.sh --all
 
   responsive:
     name: responsive (${{ matrix.browser }})

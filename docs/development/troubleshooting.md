@@ -61,6 +61,31 @@ cargo install lychee       # any platform with Rust
 
 Or download the static Linux binary from the [lychee releases](https://github.com/lycheeverse/lychee/releases/latest) (`lychee-x86_64-unknown-linux-musl.tar.gz`) and put `lychee` in a directory on your `PATH`, such as `~/.local/bin`.
 
+## `gitleaks` not installed
+
+**Symptom:** a commit stops with `gitleaks is not installed`.
+
+**Fix:** gitleaks is a Go binary, not an npm package. Install one of these:
+
+```bash
+brew install gitleaks                                  # macOS / Linuxbrew
+go install github.com/zricethezav/gitleaks/v8@latest   # any platform with Go
+```
+
+Or download the Linux binary from the [gitleaks releases](https://github.com/gitleaks/gitleaks/releases/latest) (`gitleaks_<version>_linux_x64.tar.gz`) and put `gitleaks` in a directory on your `PATH`, such as `~/.local/bin`. CI pins the version in `GITLEAKS_VERSION` (`ci.yml`).
+
+## gitleaks flags a false positive
+
+**Symptom:** the pre-commit hook or the CI `secrets` job reports a leak in something that isn't a secret (a test fixture, a placeholder).
+
+**Fix:** if it's a real secret, remove it, rotate it, and never commit it. If it isn't, ask for review before adding a path or regex to the allowlist in `.gitleaks.toml`; one-off `gitleaks:allow` comments are not used in this repo.
+
+## Commit refused on `main`
+
+**Symptom:** `pre-commit: refusing to commit on main`.
+
+**Fix:** move the work to a branch: `git switch -c feat/short-name`, then commit. Your staged changes come with you.
+
 ## Link check fails on a heading anchor
 
 **Symptom:** `check:links` reports `Cannot find fragment` for `file.md#some-heading`.

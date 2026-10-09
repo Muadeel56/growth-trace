@@ -19,11 +19,12 @@ const eslint = new ESLint({
   overrideConfig: { files: ['**/*.{ts,tsx}'], ...tseslint.configs.disableTypeChecked },
 });
 
-const STYLING_RULE = /^(aurora\/|better-tailwindcss\/|@eslint-community\/eslint-comments\/)/;
+const LOCKED_RULE =
+  /^(aurora\/|better-tailwindcss\/|@eslint-community\/eslint-comments\/|no-console$)/;
 
 async function lint(code: string, file: string) {
   const [result] = await eslint.lintText(code, { filePath: path.join(repoRoot, file) });
-  return result!.messages.filter((m) => m.ruleId && STYLING_RULE.test(m.ruleId));
+  return result!.messages.filter((m) => m.ruleId && LOCKED_RULE.test(m.ruleId));
 }
 
 describe('ESLint styling enforcement', () => {

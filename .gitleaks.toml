@@ -1,0 +1,15 @@
+# Secret scanning config for gitleaks (https://github.com/gitleaks/gitleaks). Used by the
+# pre-commit hook (scripts/check-secrets.sh) and the CI `secrets` job.
+# See docs/development/quality-gates.md#secret-scanning.
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Placeholder values and generated or binary files"
+paths = [
+  '''^\.env\.example$''',
+  '''(^|/)package-lock\.json$''',
+  '''^e2e/__screenshots__/''',
+  '''^docs/api/openapi\.json$''',
+]
